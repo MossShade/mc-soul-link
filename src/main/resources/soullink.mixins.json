@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.mossshade.soullink.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "HungerManagerMixin",
+    "LivingEntityMixin",
+    "PlayerEntityMixin",
+    "ServerPlayerEntityAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

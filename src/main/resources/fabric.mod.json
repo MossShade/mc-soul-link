@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "soullink",
+  "version": "${version}",
+  "name": "SoulLink",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "AGPL-3.0",
+  "icon": "assets/soullink/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.mossshade.soullink.Soullink"
+    ],
+    "client": [
+      "com.mossshade.soullink.SoulLinkClient"
+    ]
+  },
+  "mixins": [
+    "soullink.mixins.json",
+    {
+      "config": "soullink.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
