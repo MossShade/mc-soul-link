@@ -1,8 +1,10 @@
 package com.mossshade.soullink.events;
 
 import com.mossshade.soullink.Soullink;
+import com.mossshade.soullink.config.ConfigManager;
 import com.mossshade.soullink.pool.PoolManager;
 import com.mossshade.soullink.pool.SharedPoolPayload;
+import com.mossshade.soullink.pool.SharedPoolState;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -17,17 +19,15 @@ public class ServerTickHandler {
 		if (minecraftServer == null) return;
 
 		if (PoolManager.isDirty()) {
-			Soullink.LOGGER.debug("Syncing Pool: {}", PoolManager.getPool(minecraftServer));
+			SharedPoolState pool = PoolManager.getPool(minecraftServer);
+			Soullink.LOGGER.debug("Syncing Pool: {}", pool);
 
+			Float poolHealth = (ConfigManager.isHealthDisabled()) ? -1f : pool.getHealth();
+			Integer poolHunger = (ConfigManager.isFoodDisabled()) ? -1 : pool.getFoodLevel();
 			String dirtyPlayerUuidString = (PoolManager.getDirtyPlayer() != null) ? PoolManager.getDirtyPlayer().toString() : "";
 
 			for (ServerPlayerEntity serverPlayer : serverWorld.getPlayers()) {
-				ServerPlayNetworking.send(serverPlayer, new SharedPoolPayload(
-						PoolManager.getPool(minecraftServer).getHealth(),
-						PoolManager.getPool(minecraftServer).getFoodLevel(),
-						dirtyPlayerUuidString
-						)
-				);
+				ServerPlayNetworking.send(serverPlayer, new SharedPoolPayload(poolHealth, poolHunger, dirtyPlayerUuidString));
 			}
 
 			PoolManager.clean();

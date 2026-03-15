@@ -9,11 +9,15 @@ public class ClientSharedPool {
 
 	public static void setHealth(MinecraftClient client, Float health) {
 		assert client.player != null;
+		if (health < 0) return;
+
 		client.player.setHealth(health);
 	}
 
 	public static void setFood(MinecraftClient client, Integer food) {
 		assert client.player != null;
+		if (food < 0) return;
+
 		client.player.getHungerManager().setFoodLevel(food);
 	}
 

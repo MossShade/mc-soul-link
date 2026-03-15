@@ -1,5 +1,6 @@
 package com.mossshade.soullink.pool;
 
+import com.mossshade.soullink.config.ConfigManager;
 import com.mossshade.soullink.damage.SoullinkDamageTypes;
 import com.mossshade.soullink.mixin.ServerPlayerEntityAccessor;
 import net.minecraft.entity.damage.DamageSource;
@@ -93,9 +94,13 @@ public class PoolManager {
 	}
 
 	public static void syncPlayer(ServerPlayerEntity serverPlayerEntity, float health, int foodLevel) {
-		serverPlayerEntity.setHealth(health);
-		((ServerPlayerEntityAccessor) serverPlayerEntity).setSyncedHealth(health);
-		serverPlayerEntity.getHungerManager().setFoodLevel(foodLevel);
+		if (!ConfigManager.isHealthDisabled()) {
+			serverPlayerEntity.setHealth(health);
+			((ServerPlayerEntityAccessor) serverPlayerEntity).setSyncedHealth(health);
+		}
+		if (!ConfigManager.isFoodDisabled()) {
+			serverPlayerEntity.getHungerManager().setFoodLevel(foodLevel);
+		}
 	}
 
 	public static boolean isDirty() {
