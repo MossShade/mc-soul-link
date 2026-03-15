@@ -1,5 +1,6 @@
 package com.mossshade.soullink.pool;
 
+import com.mossshade.soullink.Soullink;
 import com.mossshade.soullink.config.ConfigManager;
 import com.mossshade.soullink.damage.SoullinkDamageTypes;
 import com.mossshade.soullink.mixin.ServerPlayerEntityAccessor;
@@ -75,6 +76,8 @@ public class PoolManager {
 	}
 
 	public static void killEveryone(MinecraftServer minecraftServer, DamageSource source) {
+		Soullink.LOGGER.debug("killEveryone due to {}", source);
+
 		for (ServerWorld world : minecraftServer.getWorlds()) {
 			for (ServerPlayerEntity serverPlayerEntity : world.getPlayers()) {
 				if (dirtyPlayerUuid != null && dirtyPlayerUuid == serverPlayerEntity.getUuid()) continue;
