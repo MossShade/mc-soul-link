@@ -7,14 +7,15 @@ import com.mossshade.soullink.interfaces.HungerManagerAccess;
 import com.mossshade.soullink.overrides.PoolMockPlayer;
 import com.mossshade.soullink.pool.PoolAPI;
 import com.mossshade.soullink.pool.SharedPoolManager;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerEntity.class)
@@ -30,10 +31,8 @@ public class PlayerEntityMixin {
 		((HungerManagerAccess) hungerManager).soullink$setPlayer(serverPlayerEntity);
 	}
 
-	@Redirect(method = "applyDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setHealth(F)V"))
-	public void applyDamage(PlayerEntity instance, float amount) {
-		instance.setHealth(amount);
-
+	@Inject(method = "applyDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setHealth(F)V"))
+	public void applyDamage(ServerWorld world, DamageSource source, float amount, CallbackInfo ci) {
 		PlayerEntity self = (PlayerEntity)(Object) this;
 		if (!(self instanceof ServerPlayerEntity player)) return;
 		if (player == null || player.getGameProfile() == null || player instanceof PoolMockPlayer) return;

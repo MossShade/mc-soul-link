@@ -76,15 +76,6 @@ public class SharedPoolState extends PersistentState {
 		return serverWorld.getPersistentStateManager().getOrCreate(TYPE);
 	}
 
-
-	public float getMaxHealth() {
-		return maxHealth;
-	}
-
-	public int getMaxFoodLevel() {
-		return maxFoodLevel;
-	}
-
 	public float getHealth() {
 		return this.health;
 	}

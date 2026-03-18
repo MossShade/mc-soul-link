@@ -39,14 +39,6 @@ public class SharedPoolManager implements IPoolManager<ServerPlayerEntity> {
 		return this.pool.getHealth();
 	}
 
-	public float getMaxHealth() {
-		return this.pool.getMaxHealth();
-	}
-
-	public int getMaxFoodLevel() {
-		return this.pool.getMaxFoodLevel();
-	}
-
 	public int getPoolFoodLevel() {
 		return this.pool.getFoodLevel();
 	}
@@ -126,30 +118,6 @@ public class SharedPoolManager implements IPoolManager<ServerPlayerEntity> {
 
 	public void propagateHealth(float health) {
 		this.pool.setHealth(health);
-
-		this.propagatePool();
-	}
-
-	public void propagateFoodLevel(int food) {
-		this.pool.setFoodLevel(food);
-
-		this.propagatePool();
-	}
-
-	public void propagateSaturationLevel(float saturation) {
-		this.pool.setSaturationLevel(saturation);
-
-		this.propagatePool();
-	}
-
-	public void propagateExhaustion(float exhaustion) {
-		this.pool.setExhaustion(exhaustion);
-
-		this.propagatePool();
-	}
-
-	public void propagateFoodTickTimer(int foodTickTimer) {
-		this.pool.setFoodTickTimer(foodTickTimer);
 
 		this.propagatePool();
 	}
