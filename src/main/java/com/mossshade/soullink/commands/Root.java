@@ -2,7 +2,7 @@ package com.mossshade.soullink.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mossshade.soullink.utils.Constants;
+import com.mossshade.soullink.Constants;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 

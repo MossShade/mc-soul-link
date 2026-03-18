@@ -4,18 +4,12 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mossshade.soullink.Soullink;
+import com.mossshade.soullink.Constants;
 import com.mossshade.soullink.commands.config.Enable;
-import com.mossshade.soullink.commands.config.Food;
-import com.mossshade.soullink.commands.config.Health;
 import com.mossshade.soullink.commands.config.Reload;
 import com.mossshade.soullink.config.ConfigManager;
 import com.mossshade.soullink.config.ModConfig;
-import com.mossshade.soullink.utils.Constants;
 import net.minecraft.command.DefaultPermissions;
-import net.minecraft.command.permission.LeveledPermissionPredicate;
-import net.minecraft.command.permission.Permission;
-import net.minecraft.command.permission.PermissionLevel;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.ClickEvent;
@@ -33,8 +27,6 @@ public class Config implements Command<ServerCommandSource> {
 
 		Enable.register(config);
 		Reload.register(config);
-		Health.register(config);
-		Food.register(config);
 
 		root.then(config.executes(new Config()));
 	}
@@ -72,30 +64,10 @@ public class Config implements Command<ServerCommandSource> {
 						)
 				);
 
-		MutableText healthPooling = Text.literal(padding)
-				.append(Text.translatable(Constants.COMMAND_HELP_CONFIG_HEALTH)
-						.styled(style -> style
-								.withColor(config.shared_health ? Formatting.GREEN : Formatting.RED)
-								.withClickEvent(interactable ? getCommandSuggestion(Constants.COMMAND_CONFIG_HEALTH, !config.shared_health) : null)
-								.withHoverEvent(interactable ? new HoverEvent.ShowText(hoverMessage) : null)
-						)
-				);
-
-		MutableText foodPooling = Text.literal(padding)
-				.append(Text.translatable(Constants.COMMAND_HELP_CONFIG_FOOD)
-						.styled(style -> style
-								.withColor(config.shared_food ? Formatting.GREEN : Formatting.RED)
-								.withClickEvent(interactable ? getCommandSuggestion(Constants.COMMAND_CONFIG_FOOD, !config.shared_food) : null)
-								.withHoverEvent(interactable ? new HoverEvent.ShowText(hoverMessage) : null)
-						)
-				);
-
 
 		return Text.empty()
 				.append(title).append(newLine)
-				.append(enabled).append(newLine)
-				.append(healthPooling).append(newLine)
-				.append(foodPooling);
+				.append(enabled);
 	}
 
 }

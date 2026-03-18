@@ -1,13 +1,8 @@
 package com.mossshade.soullink.events;
 
-import com.mossshade.soullink.Soullink;
-import com.mossshade.soullink.config.ConfigManager;
-import com.mossshade.soullink.pool.PoolManager;
-import com.mossshade.soullink.pool.SharedPoolPayload;
-import com.mossshade.soullink.pool.SharedPoolState;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import com.mossshade.soullink.pool.PoolAPI;
+import com.mossshade.soullink.pool.SharedPoolManager;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 
 public class ServerTickHandler {
@@ -18,20 +13,31 @@ public class ServerTickHandler {
 		MinecraftServer minecraftServer = serverWorld.getServer();
 		if (minecraftServer == null) return;
 
-		if (PoolManager.isDirty()) {
-			SharedPoolState pool = PoolManager.getPool(minecraftServer);
-			Soullink.LOGGER.debug("Syncing Pool: {}", pool);
+		if (serverWorld.getPlayers().isEmpty()) return;
 
-			Float poolHealth = (ConfigManager.isHealthDisabled()) ? -1f : pool.getHealth();
-			Integer poolHunger = (ConfigManager.isFoodDisabled()) ? -1 : pool.getFoodLevel();
-			String dirtyPlayerUuidString = (PoolManager.getDirtyPlayer() != null) ? PoolManager.getDirtyPlayer().toString() : "";
+		SharedPoolManager poolManager = PoolAPI.get(serverWorld);
 
-			for (ServerPlayerEntity serverPlayer : serverWorld.getPlayers()) {
-				ServerPlayNetworking.send(serverPlayer, new SharedPoolPayload(poolHealth, poolHunger, dirtyPlayerUuidString));
-			}
+		poolManager.tickSharedHunger();
 
-			PoolManager.clean();
-		}
+		// TODO: Find out how to send a packet only when needed so that we don't clog the network
+//		if (!ConfigManager.isDisabled() && poolManager.dirtyTracker.isDirty()) {
+//
+//			Soullink.LOGGER.debug("Syncing Pool: {}", poolManager);
+//
+//			String dirtyPlayerUuidString = (poolManager.dirtyTracker.getDirt() == null) ? "" : poolManager.dirtyTracker.getDirt().toString();
+//
+//			for (ServerPlayerEntity serverPlayer : serverWorld.getPlayers()) {
+//				ServerPlayNetworking.send(serverPlayer, new SharedPoolPayload(
+//						poolManager.getPoolHealth(),
+//						poolManager.getPoolFoodLevel(),
+//						poolManager.getPoolSaturationLevel(),
+//						poolManager.getPoolExhaustion(),
+//						poolManager.getPoolFoodTickTimer(),
+//						dirtyPlayerUuidString));
+//			}
+//
+//			poolManager.dirtyTracker.clean();
+//		}
 	}
 
 }

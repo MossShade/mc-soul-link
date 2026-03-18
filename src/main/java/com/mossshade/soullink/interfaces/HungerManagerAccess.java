@@ -8,4 +8,11 @@ public interface HungerManagerAccess {
 
 	void soullink$setPlayer(ServerPlayerEntity player);
 
+	float soullink$getExhaustion();
+
+	void soullink$setExhaustion(float exhaustion);
+
+	int soullink$getFoodTickTimer();
+	void soullink$setFoodTickTimer(int foodTickTimer);
+
 }

@@ -2,8 +2,8 @@ package com.mossshade.soullink.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mossshade.soullink.Constants;
 import com.mossshade.soullink.Soullink;
-import com.mossshade.soullink.utils.Constants;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.Reader;
@@ -42,12 +42,8 @@ public class ConfigManager {
 		}
 	}
 
-	public static boolean isHealthDisabled() {
-		return !CONFIG.enabled || !CONFIG.shared_health;
-	}
-
-	public static boolean isFoodDisabled() {
-		return !CONFIG.enabled || !CONFIG.shared_food;
+	public static boolean isDisabled() {
+		return !CONFIG.enabled;
 	}
 
 }

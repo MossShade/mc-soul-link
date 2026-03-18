@@ -2,16 +2,12 @@
   "death.attack.soullink_fragmentation_damage_type": "%1$s's soul fragmented!",
   "soullink.message.respawn.reset": "Respawning souls resets statuses.",
   "soullink.message.command.reset": "Reset statuses to default values.",
-  "soullink.message.command.status": "Current values - Health: %1$s Food: %2$s",
+  "soullink.message.command.status": "Current values:\n Health: %1$s\n Food: %2$s\n Saturation: %3$s\n Exhaustion: %4$s\n Food Timer: %5$s",
   "soullink.message.config.enable": "SoulLink %1$s.",
   "soullink.message.config.reload": "Config file reloaded.",
-  "soullink.message.config.health": "Health sharing %1$s.",
-  "soullink.message.config.food": "Food sharing %1$s.",
   "soullink.message.config.status.enabled": "enabled",
   "soullink.message.config.status.disabled": "disabled",
   "soullink.command.help.config.hover": "Click to toggle config",
   "soullink.commmand.help.config.title": "Config",
-  "soullink.commmand.help.config.enable": "Enabled",
-  "soullink.commmand.help.config.health": "Shared Health",
-  "soullink.commmand.help.config.food": "Shared Food"
+  "soullink.commmand.help.config.enable": "Enabled"
 }

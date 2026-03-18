@@ -11,6 +11,6 @@ public interface ServerPlayerEntityAccessor {
 	void setSyncedHealth(float value);
 
 	@Accessor("syncedHealth")
-	void getSyncedHealth(float value);
+	float getSyncedHealth();
 
 }

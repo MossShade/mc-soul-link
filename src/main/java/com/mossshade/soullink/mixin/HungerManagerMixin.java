@@ -1,52 +1,50 @@
 package com.mossshade.soullink.mixin;
 
+import com.mossshade.soullink.Soullink;
 import com.mossshade.soullink.config.ConfigManager;
 import com.mossshade.soullink.interfaces.HungerManagerAccess;
-import com.mossshade.soullink.Soullink;
-import com.mossshade.soullink.utils.Helpers;
-import com.mossshade.soullink.pool.PoolManager;
-import net.minecraft.component.type.FoodComponent;
+import com.mossshade.soullink.overrides.PoolMockPlayer;
+import com.mossshade.soullink.pool.PoolAPI;
+import com.mossshade.soullink.pool.SharedPoolManager;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HungerManager.class)
 public class HungerManagerMixin implements HungerManagerAccess {
 
+	@Shadow
+	private float exhaustion;
+	@Shadow
+	private int foodTickTimer;
 	@Unique
 	private ServerPlayerEntity soullink$player;
 
-	// TODO: Look at changing this to an Injection
-	@Redirect(method = "update", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/HungerManager;foodLevel:I", opcode = Opcodes.PUTFIELD))
-	private void addExhaustion(HungerManager instance, int value) {
-		instance.setFoodLevel(value);
+	@Inject(method = "update", at = @At("HEAD"), cancellable = true)
+	private void update(ServerPlayerEntity player, CallbackInfo ci) {
+		if (player == null || player.getGameProfile() == null || player instanceof PoolMockPlayer) return;
+		if (ConfigManager.isDisabled()) return;
 
-		ServerPlayerEntity player = this.soullink$getPlayer();
-		if (player == null || player.getGameProfile() == null) return;
-		if (ConfigManager.isFoodDisabled()) return;
-
-		Soullink.LOGGER.debug("update foodLevel {} for player {}", value, player);
-
-		PoolManager.setDirtyPlayer(player);
-		PoolManager.propagateFood(Helpers.getMinecraftServer(player), (float) value);
+		ci.cancel();
 	}
 
-	@Inject(method = "eat", at = @At("TAIL"))
-	private void eat(FoodComponent foodComponent, CallbackInfo ci) {
+	@Inject(method = "addInternal", at = @At("TAIL"))
+	private void eat(int nutrition, float saturation, CallbackInfo ci) {
 		ServerPlayerEntity player = this.soullink$getPlayer();
-		if (player == null || player.getGameProfile() == null) return;
-		if (ConfigManager.isFoodDisabled()) return;
+		if (player == null || player.getGameProfile() == null || player instanceof PoolMockPlayer) return;
+		if (ConfigManager.isDisabled()) return;
 
-		Soullink.LOGGER.debug("eat {} nutrition and {} saturation for player {}", foodComponent.nutrition(), foodComponent.saturation(), player);
+		SharedPoolManager poolManager = PoolAPI.get(player);
 
-		PoolManager.setDirtyPlayer(player);
-		PoolManager.propagateEating(Helpers.getMinecraftServer(player), foodComponent.nutrition());
+		Soullink.LOGGER.debug("eat {} nutrition and {} saturation for player {}", nutrition, saturation, player);
+
+		poolManager.dirtyTracker.markDirty(player.getUuid());
+		poolManager.addFood(nutrition, saturation);
 	}
 
 	@Override
@@ -57,5 +55,25 @@ public class HungerManagerMixin implements HungerManagerAccess {
 	@Override
 	public void soullink$setPlayer(ServerPlayerEntity player) {
 		this.soullink$player = player;
+	}
+
+	@Override
+	public float soullink$getExhaustion() {
+		return this.exhaustion;
+	}
+
+	@Override
+	public void soullink$setExhaustion(float exhaustion) {
+		this.exhaustion = exhaustion;
+	}
+
+	@Override
+	public int soullink$getFoodTickTimer() {
+		return this.foodTickTimer;
+	}
+
+	@Override
+	public void soullink$setFoodTickTimer(int foodTickTimer) {
+		this.foodTickTimer = foodTickTimer;
 	}
 }

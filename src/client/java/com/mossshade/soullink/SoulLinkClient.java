@@ -1,7 +1,6 @@
 package com.mossshade.soullink;
 
 import com.mossshade.soullink.pool.SharedPoolPayload;
-import com.mossshade.soullink.utils.Constants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -26,7 +25,10 @@ public class SoulLinkClient implements ClientModInitializer {
 					if (client.player.getUuid().toString().equals(payload.playerUuid())) return;
 
 					ClientSharedPool.setHealth(client, payload.health());
-					ClientSharedPool.setFood(client, payload.food());
+					ClientSharedPool.setFood(client, payload.foodLevel());
+					ClientSharedPool.setSaturation(client, payload.saturationLevel());
+					ClientSharedPool.setExhaustion(client, payload.exhaustion());
+					ClientSharedPool.setFoodTickTimer(client, payload.foodTickTimer());
 				}
 			});
 		});

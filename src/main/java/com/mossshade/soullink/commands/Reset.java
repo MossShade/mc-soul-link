@@ -4,8 +4,8 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mossshade.soullink.pool.PoolManager;
-import com.mossshade.soullink.utils.Constants;
+import com.mossshade.soullink.Constants;
+import com.mossshade.soullink.pool.PoolAPI;
 import net.minecraft.command.DefaultPermissions;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
@@ -26,7 +26,7 @@ public class Reset implements Command<ServerCommandSource> {
 		ServerCommandSource serverCommandSource = context.getSource();
 		MinecraftServer minecraftServer = serverCommandSource.getServer();
 
-		PoolManager.reset(minecraftServer);
+		PoolAPI.get(minecraftServer).reset();
 
 		serverCommandSource.sendFeedback(() -> Text.translatable(Constants.COMMAND_RESET_MESSAGE), false);
 

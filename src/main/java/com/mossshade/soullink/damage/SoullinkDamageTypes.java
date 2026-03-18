@@ -1,6 +1,6 @@
 package com.mossshade.soullink.damage;
 
-import com.mossshade.soullink.utils.Constants;
+import com.mossshade.soullink.Constants;
 import net.minecraft.entity.damage.*;
 import net.minecraft.registry.entry.RegistryEntry;
 
