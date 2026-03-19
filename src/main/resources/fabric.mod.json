@@ -3,26 +3,19 @@
   "id": "soullink",
   "version": "${version}",
   "name": "SoulLink",
-  "description": "",
-  "authors": [],
-  "contact": {},
+  "description": "Co-op challenge mod that links your souls with your friends! Everyone shares the same health, hunger, and saturation",
+  "authors": ["MossShade"],
+  "contact": {"twitch": "https://twitch.tv/mossshade"},
   "license": "AGPL-3.0",
   "icon": "assets/soullink/icon.png",
-  "environment": "*",
+  "environment": "server",
   "entrypoints": {
     "main": [
       "com.mossshade.soullink.Soullink"
-    ],
-    "client": [
-      "com.mossshade.soullink.SoulLinkClient"
     ]
   },
   "mixins": [
-    "soullink.mixins.json",
-    {
-      "config": "soullink.client.mixins.json",
-      "environment": "client"
-    }
+    "soullink.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${loader_version}",
