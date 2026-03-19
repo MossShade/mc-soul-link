@@ -43,7 +43,7 @@ public class PlayerEntityMixin {
 		Soullink.LOGGER.debug("applyDamage {} for player {}", amount, player);
 
 		poolManager.dirtyTracker.markDirty(player.getUuid());
-		poolManager.propagateHealth(amount);
+		poolManager.addDamage(amount);
 	}
 
 	@Inject(method = "addExhaustion", at = @At("TAIL"))
