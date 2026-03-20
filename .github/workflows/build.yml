@@ -1,0 +1,57 @@
+name: Build and Release Fabric Mod
+
+on:
+  push:
+    tags:
+      - 'release/v*.*.*'
+
+jobs:
+  build:
+    name: Build and Release Fabric Mod
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read Java Version from Gradle
+        run: echo "JAVA_VERSION=$(grep 'java_version' gradle.properties | cut -d'=' -f2)" >> $GITHUB_ENV
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build Fabric mod and resource pack
+        run: gradle build buildResourcePack
+
+      - name: Find JAR file
+        id: find_jar
+        run: echo "JAR_FILE=$(find build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-sources.jar')" >> $GITHUB_ENV
+
+      - name: Find ResourcePack file
+        id: find_resource_pack
+        run: echo "RESOURCE_PACK_FILE=$(find build/libs -maxdepth 1 -type f -name '*-resourcepack.zip' )" >> $GITHUB_ENV
+
+      - name: Generate checksum
+        id: generate_checksum
+        run: |
+          JAR_SHA1=$(sha1sum ${{ env.JAR_FILE }} | cut -d ' ' -f 1)
+          JAR_SHA256=$(sha256sum ${{ env.JAR_FILE }} | cut -d ' ' -f 1)
+          RESOURCE_PACK_SHA1=$(sha1sum ${{ env.RESOURCE_PACK_FILE }} | cut -d ' ' -f 1)
+          RESOURCE_PACK_SHA256=$(sha256sum ${{ env.RESOURCE_PACK_FILE }} | cut -d ' ' -f 1)
+          echo "Jar SHA1: $JAR_SHA1" >> CHECKSUM.txt
+          echo "Jar SHA256: $JAR_SHA256" >> CHECKSUM.txt
+          echo "Resource Pack SHA1: $RESOURCE_PACK_SHA1" >> CHECKSUM.txt
+          echo "Resource Pack SHA256: $RESOURCE_PACK_SHA256" >> CHECKSUM.txt
+
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "${{ env.JAR_FILE }},${{ env.RESOURCE_PACK_FILE }},CHECKSUM.txt"
+          bodyFile: "CHANGELOG.md"
