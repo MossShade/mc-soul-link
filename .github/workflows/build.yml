@@ -46,10 +46,10 @@ jobs:
           JAR_SHA256=$(sha256sum ${{ env.JAR_FILE }} | cut -d ' ' -f 1)
           RESOURCE_PACK_SHA1=$(sha1sum ${{ env.RESOURCE_PACK_FILE }} | cut -d ' ' -f 1)
           RESOURCE_PACK_SHA256=$(sha256sum ${{ env.RESOURCE_PACK_FILE }} | cut -d ' ' -f 1)
-          echo "Jar SHA1: $JAR_SHA1" >> CHECKSUM.txt
-          echo "Jar SHA256: $JAR_SHA256" >> CHECKSUM.txt
-          echo "Resource Pack SHA1: $RESOURCE_PACK_SHA1" >> CHECKSUM.txt
-          echo "Resource Pack SHA256: $RESOURCE_PACK_SHA256" >> CHECKSUM.txt
+          echo "Jar SHA1:$JAR_SHA1" >> CHECKSUM.txt
+          echo "Jar SHA256:$JAR_SHA256" >> CHECKSUM.txt
+          echo "Resource Pack SHA1:$RESOURCE_PACK_SHA1" >> CHECKSUM.txt
+          echo "Resource Pack SHA256:$RESOURCE_PACK_SHA256" >> CHECKSUM.txt
 
       - uses: ncipollo/release-action@v1
         with:
