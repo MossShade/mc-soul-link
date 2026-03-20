@@ -37,7 +37,7 @@ jobs:
 
       - name: Find ResourcePack file
         id: find_resource_pack
-        run: echo "RESOURCE_PACK_FILE=$(find build/libs -maxdepth 1 -type f -name '*-resourcepack.zip' )" >> $GITHUB_ENV
+        run: echo "RESOURCE_PACK_FILE=$(find build/libs -maxdepth 1 -type f -name '*-resourcepack-*.zip' )" >> $GITHUB_ENV
 
       - name: Generate checksum
         id: generate_checksum

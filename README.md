@@ -31,8 +31,7 @@ Note: Since this is a server-only mod, all clients, including vanilla clients, a
 The mod uses a language resource pack to provide translations. (Currently only English)
 
 #### Download on Clients
-Download the resource pack from [here](TODO)
-and place it in your client `resourcepacks` folder.
+Download the resource pack and place it in your client `resourcepacks` folder.
 
 #### Push from Server
 Alternatively, you can set the server to push the resource pack to clients by setting the following in `server.properties`:
