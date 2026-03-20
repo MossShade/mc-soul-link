@@ -3,6 +3,9 @@ plugins {
 	id 'maven-publish'
 }
 
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
 version = project.mod_version
 group = project.maven_group
 
@@ -98,5 +101,53 @@ publishing {
 		// Notice: This block does NOT have the same function as the block in the top level.
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
+	}
+}
+
+
+// Build resource pack
+def fabricModJsonFile = file("src/main/resources/fabric.mod.json")
+def fabricModMetadata = new JsonSlurper().parse(fabricModJsonFile)
+def resourcePackName = fabricModMetadata.name
+def resourcePackIconPath = fabricModMetadata.icon
+def resourcePackSupportedFormats = project.pack_supported_formats
+		.split(',')
+		.collect { it.trim() }
+		.findAll { !it.isEmpty() }
+		.collect { Integer.parseInt(it) }
+def packMcmeta = [
+		pack: [
+				description      : "Resource pack for ${resourcePackName} mod",
+				pack_format      : Integer.parseInt(project.pack_format.toString()),
+				min_format       : Integer.parseInt(project.pack_min_format.toString()),
+				max_format       : Integer.parseInt(project.pack_max_format.toString()),
+				supported_formats: resourcePackSupportedFormats
+		]
+]
+
+tasks.register("buildResourcePack", Zip) {
+	group = "build"
+	description = "Builds a standalone resource pack zip from src/main/resources/assets."
+
+	archiveBaseName = "${project.archives_base_name}-resourcepack"
+	archiveVersion = project.version.toString()
+	destinationDirectory = layout.buildDirectory.dir("libs")
+
+	from("src/main/resources/assets") {
+		exclude(resourcePackIconPath.replaceFirst("^assets/", ""))
+		into("assets")
+	}
+
+	from("src/main/resources") {
+		include(resourcePackIconPath)
+		eachFile { details ->
+			details.path = details.name
+		}
+		includeEmptyDirs = false
+	}
+
+	from(resources.text.fromString(JsonOutput.prettyPrint(JsonOutput.toJson(packMcmeta)))) {
+		rename { "pack.mcmeta" }
+		into("/")
 	}
 }
