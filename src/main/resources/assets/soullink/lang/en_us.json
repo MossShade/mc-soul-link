@@ -1,5 +1,6 @@
 {
   "death.attack.soullink_fragmentation_damage_type": "%1$s's soul fragmented!",
+  "death.attack.soullink_fragmentation_damage_type.player": "%1$s's soul fragmented by %2$s!",
   "soullink.message.respawn.reset": "Respawning souls resets statuses.",
   "soullink.message.command.reset": "Reset statuses to default values.",
   "soullink.message.command.status": "Current values:\n Health: %1$s\n Food: %2$s\n Saturation: %3$s\n Exhaustion: %4$s\n Food Timer: %5$s",

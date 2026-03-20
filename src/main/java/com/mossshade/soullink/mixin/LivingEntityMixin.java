@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin {
 
-	@Inject(method = "heal", at = @At("TAIL"))
+	@Inject(method = "heal", at = @At("HEAD"), cancellable = true)
 	public void heal(float amount, CallbackInfo ci) {
 		LivingEntity livingEntity = (LivingEntity)(Object) this;
 		if (!(livingEntity instanceof ServerPlayerEntity player)) return;
@@ -30,6 +30,8 @@ public class LivingEntityMixin {
 
 		poolManager.dirtyTracker.markDirty(player.getUuid());
 		poolManager.addHeal(amount);
+
+		ci.cancel();
 	}
 
 	@Inject(method = "tryUseDeathProtector", at = @At("TAIL"))
@@ -47,7 +49,7 @@ public class LivingEntityMixin {
 
 		poolManager.dirtyTracker.markDirty(player.getUuid());
 		if (usedDeathProtector) {
-			poolManager.propagateHealth(player.getHealth());
+			poolManager.propagateHealth(1.0F);
 		} else {
 			poolManager.killEveryone(source);
 		}

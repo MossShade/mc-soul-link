@@ -15,6 +15,7 @@ public class ServerTickHandler {
 		if (serverWorld.getPlayers().isEmpty()) return;
 
 		PoolAPI.get(serverWorld).tickSharedHunger();
+		PoolAPI.get(serverWorld).propagatePool();
 	}
 
 }

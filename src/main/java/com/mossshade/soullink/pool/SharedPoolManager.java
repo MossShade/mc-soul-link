@@ -58,7 +58,7 @@ public class SharedPoolManager implements IPoolManager<ServerPlayerEntity> {
 	@Override
 	public void propagatePool() {
 		this.pool.markDirty();
-		this.dirtyTracker.markDirty(null);
+		this.dirtyTracker.markDirty(dirtyTracker.getDirt());
 
 		syncEveryone();
 	}
@@ -118,33 +118,23 @@ public class SharedPoolManager implements IPoolManager<ServerPlayerEntity> {
 
 	public void propagateHealth(float health) {
 		this.pool.setHealth(health);
-
-		this.propagatePool();
 	}
 
 	public void addDamage(float damage) {
 		this.pool.setHealth(this.pool.getHealth() - damage);
-
-		this.propagatePool();
 	}
 
 	public void addHeal(float heal) {
 		this.pool.setHealth(this.pool.getHealth() + heal);
-
-		this.propagatePool();
 	}
 
 	public void addExhaustion(float exhaustion) {
 		this.pool.setExhaustion(this.pool.getExhaustion() + exhaustion);
-
-		this.propagatePool();
 	}
 
 	public void addFood(int nutrition, float saturation) {
 		this.pool.setFoodLevel(this.pool.getFoodLevel() + nutrition);
 		this.pool.setSaturationLevel(this.pool.getSaturationLevel() + saturation);
-
-		this.propagatePool();
 	}
 
 	public void tickSharedHunger() {
@@ -161,14 +151,14 @@ public class SharedPoolManager implements IPoolManager<ServerPlayerEntity> {
 		this.pool.setSaturationLevel(this.hungerManager.getSaturationLevel());
 		this.pool.setExhaustion(this.hungerManager.getAccess().soullink$getExhaustion());
 		this.pool.setFoodTickTimer(this.hungerManager.getAccess().soullink$getFoodTickTimer());
-
-		this.propagatePool();
 	}
 
 	@Override
 	public String toString() {
 		return "SharedPoolManager{" +
 				"pool=" + pool +
+				", dirtyTracker=" + dirtyTracker +
 				'}';
 	}
+
 }

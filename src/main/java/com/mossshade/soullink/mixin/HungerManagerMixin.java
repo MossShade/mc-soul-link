@@ -33,7 +33,7 @@ public class HungerManagerMixin implements HungerManagerAccess {
 		ci.cancel();
 	}
 
-	@Inject(method = "addInternal", at = @At("TAIL"))
+	@Inject(method = "addInternal", at = @At("HEAD"), cancellable = true)
 	private void eat(int nutrition, float saturation, CallbackInfo ci) {
 		ServerPlayerEntity player = this.soullink$getPlayer();
 		if (player == null || player.getGameProfile() == null || player instanceof PoolMockPlayer) return;
@@ -45,6 +45,8 @@ public class HungerManagerMixin implements HungerManagerAccess {
 
 		poolManager.dirtyTracker.markDirty(player.getUuid());
 		poolManager.addFood(nutrition, saturation);
+
+		ci.cancel();
 	}
 
 	@Override

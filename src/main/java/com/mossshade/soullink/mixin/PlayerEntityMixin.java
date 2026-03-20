@@ -31,7 +31,7 @@ public class PlayerEntityMixin {
 		((HungerManagerAccess) hungerManager).soullink$setPlayer(serverPlayerEntity);
 	}
 
-	@Inject(method = "applyDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setHealth(F)V"))
+	@Inject(method = "applyDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setHealth(F)V", shift = At.Shift.AFTER))
 	public void applyDamage(ServerWorld world, DamageSource source, float amount, CallbackInfo ci) {
 		PlayerEntity self = (PlayerEntity)(Object) this;
 		if (!(self instanceof ServerPlayerEntity player)) return;
@@ -46,7 +46,7 @@ public class PlayerEntityMixin {
 		poolManager.addDamage(amount);
 	}
 
-	@Inject(method = "addExhaustion", at = @At("TAIL"))
+	@Inject(method = "addExhaustion", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/HungerManager;addExhaustion(F)V", shift = At.Shift.AFTER))
 	public void addExhaustion(float exhaustion, CallbackInfo ci) {
 		PlayerEntity self = (PlayerEntity)(Object) this;
 		if (!(self instanceof ServerPlayerEntity player)) return;
