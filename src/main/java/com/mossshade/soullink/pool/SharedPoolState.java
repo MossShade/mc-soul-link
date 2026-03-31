@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.mossshade.soullink.Constants;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -43,7 +44,7 @@ public class SharedPoolState extends SavedData {
 	);
 
 	public static final SavedDataType<SharedPoolState> TYPE = new SavedDataType<>(
-			Constants.SHARED_POOL,
+			Identifier.fromNamespaceAndPath(Constants.MOD_ID, Constants.SHARED_POOL),
 			SharedPoolState::new,
 			CODEC,
 			DataFixTypes.SAVED_DATA_COMMAND_STORAGE);

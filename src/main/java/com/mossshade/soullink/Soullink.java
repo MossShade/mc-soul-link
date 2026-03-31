@@ -24,7 +24,7 @@ public class Soullink implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register(ServerLifeCycleHandler::registerStarted);
 		ServerLifecycleEvents.SERVER_STOPPED.register(ServerLifeCycleHandler::registerStopped);
 		CommandRegistrationCallback.EVENT.register(CommandHandler::register);
-		ServerTickEvents.END_WORLD_TICK.register(ServerTickHandler::register);
+		ServerTickEvents.END_SERVER_TICK.register(ServerTickHandler::register);
 		ServerPlayerEvents.AFTER_RESPAWN.register(PlayerRespawnHandler::register);
 
 		LOGGER.info(Constants.MOD_ID + " has been initialized.");

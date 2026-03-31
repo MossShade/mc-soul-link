@@ -13,7 +13,7 @@ public class Constants {
 	public static final String FOOD_TICK_TIMER_TAG = "food_tick_timer";
 
 
-	public static final String SHARED_POOL = "soullink_shared_pool";
+	public static final String SHARED_POOL = "shared_pool";
 
 	public static final String SOULLINK_FRAGMENTATION_DAMAGE_TYPE = "soullink_fragmentation_damage_type";
 
