@@ -8,31 +8,31 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mossshade.soullink.Constants;
 import com.mossshade.soullink.commands.Config;
 import com.mossshade.soullink.config.ConfigManager;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 
-public class Enable implements Command<ServerCommandSource> {
+public class Enable implements Command<CommandSourceStack> {
 
-	public static void register(LiteralArgumentBuilder<ServerCommandSource> root) {
-		root.then(CommandManager.literal(Constants.COMMAND_CONFIG_ENABLE)
-				.then(CommandManager.argument(Constants.COMMAND_CONFIG_ARG, BoolArgumentType.bool())
+	public static void register(LiteralArgumentBuilder<CommandSourceStack> root) {
+		root.then(Commands.literal(Constants.COMMAND_CONFIG_ENABLE)
+				.then(Commands.argument(Constants.COMMAND_CONFIG_ARG, BoolArgumentType.bool())
 						.executes(new Enable())
 				)
 		);
 	}
 
 	@Override
-	public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+	public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
 		boolean enabled = BoolArgumentType.getBool(context, Constants.COMMAND_CONFIG_ARG);
 
-		ServerCommandSource serverCommandSource = context.getSource();
+		CommandSourceStack serverCommandSource = context.getSource();
 
 		ConfigManager.CONFIG.enabled = enabled;
 		ConfigManager.save();
 
-		serverCommandSource.sendFeedback(() -> Text.translatable(Constants.CONFIG_ENABLE_MESSAGE, Config.getEnableStatusMessage(enabled)), false);
-		serverCommandSource.sendFeedback(() -> Config.getFeedback(ConfigManager.CONFIG, true), false);
+		serverCommandSource.sendSuccess(() -> Component.translatable(Constants.CONFIG_ENABLE_MESSAGE, Config.getEnableStatusMessage(enabled)), false);
+		serverCommandSource.sendSuccess(() -> Config.getFeedback(ConfigManager.CONFIG, true), false);
 
 		return Command.SINGLE_SUCCESS;
 	}

@@ -7,14 +7,13 @@ import com.mossshade.soullink.interfaces.HungerManagerAccess;
 import com.mossshade.soullink.mixin.ServerPlayerEntityAccessor;
 import com.mossshade.soullink.overrides.PoolMockPlayer;
 import com.mossshade.soullink.overrides.SharedHungerManager;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import java.util.UUID;
 
-public class SharedPoolManager implements IPoolManager<ServerPlayerEntity> {
+public class SharedPoolManager implements IPoolManager<ServerPlayer> {
 
 	private final MinecraftServer minecraftServer;
 
@@ -31,7 +30,7 @@ public class SharedPoolManager implements IPoolManager<ServerPlayerEntity> {
 		this.pool = SharedPoolState.getServerState(minecraftServer);
 		this.dirtyTracker = new DirtyTracker<>();
 
-		this.mockPlayer = new PoolMockPlayer(minecraftServer, minecraftServer.getWorld(ServerWorld.OVERWORLD), this);
+		this.mockPlayer = new PoolMockPlayer(minecraftServer, minecraftServer.getLevel(ServerLevel.OVERWORLD), this);
 		this.hungerManager = new SharedHungerManager();
 	}
 
@@ -57,7 +56,7 @@ public class SharedPoolManager implements IPoolManager<ServerPlayerEntity> {
 
 	@Override
 	public void propagatePool() {
-		this.pool.markDirty();
+		this.pool.setDirty();
 		this.dirtyTracker.markDirty(dirtyTracker.getDirt());
 
 		syncEveryone();
@@ -79,28 +78,28 @@ public class SharedPoolManager implements IPoolManager<ServerPlayerEntity> {
 	}
 
 	@Override
-	public void syncEntity(ServerPlayerEntity player) {
+	public void syncEntity(ServerPlayer player) {
 		player.setHealth(this.pool.getHealth());
 
 		ServerPlayerEntityAccessor serverPlayerEntityAccessor = (ServerPlayerEntityAccessor) player;
 		if (serverPlayerEntityAccessor.getSyncedHealth() > player.getHealth()) {
-			if (this.dirtyTracker.getDirt() == null || this.dirtyTracker.getDirt() != player.getUuid()) {
+			if (this.dirtyTracker.getDirt() == null || this.dirtyTracker.getDirt() != player.getUUID()) {
 				((ServerPlayerEntityAccessor) player).setSyncedHealth(this.pool.getHealth());
 			}
 		}
 
-		player.getHungerManager().setFoodLevel(this.pool.getFoodLevel());
-		player.getHungerManager().setSaturationLevel(this.pool.getSaturationLevel());
-		HungerManagerAccess hungerManagerAccess = (HungerManagerAccess) player.getHungerManager();
+		player.getFoodData().setFoodLevel(this.pool.getFoodLevel());
+		player.getFoodData().setSaturation(this.pool.getSaturationLevel());
+		HungerManagerAccess hungerManagerAccess = (HungerManagerAccess) player.getFoodData();
 		hungerManagerAccess.soullink$setExhaustion(this.pool.getExhaustion());
 		hungerManagerAccess.soullink$setFoodTickTimer(this.pool.getFoodTickTimer());
 	}
 
 	@Override
-	public void applyToEveryone(EveryoneOperation<ServerPlayerEntity> function, boolean skipSourcePlayer) {
-		for (ServerWorld world : this.minecraftServer.getWorlds()) {
-			for (ServerPlayerEntity serverPlayerEntity : world.getPlayers()) {
-				if (!skipSourcePlayer && this.dirtyTracker.isDirty() && this.dirtyTracker.getDirt() == serverPlayerEntity.getUuid()) continue;
+	public void applyToEveryone(EveryoneOperation<ServerPlayer> function, boolean skipSourcePlayer) {
+		for (ServerLevel world : this.minecraftServer.getAllLevels()) {
+			for (ServerPlayer serverPlayerEntity : world.players()) {
+				if (!skipSourcePlayer && this.dirtyTracker.isDirty() && this.dirtyTracker.getDirt() == serverPlayerEntity.getUUID()) continue;
 
 				function.apply(serverPlayerEntity);
 			}
@@ -111,8 +110,8 @@ public class SharedPoolManager implements IPoolManager<ServerPlayerEntity> {
 		Soullink.LOGGER.debug("killEveryone due to {}", source);
 
 		this.applyToEveryone((player) -> {
-			player.getDamageTracker().onDamage(SoullinkDamageTypes.SOUL_FRAGMENTATION, 0f);
-			player.onDeath(SoullinkDamageTypes.SOUL_FRAGMENTATION);
+			player.getCombatTracker().recordDamage(SoullinkDamageTypes.SOUL_FRAGMENTATION, 0f);
+			player.die(SoullinkDamageTypes.SOUL_FRAGMENTATION);
 		} , true);
 	}
 
@@ -144,7 +143,7 @@ public class SharedPoolManager implements IPoolManager<ServerPlayerEntity> {
 		this.hungerManager.setValues(this);
 		this.mockPlayer.setHealth(this.pool.getHealth());
 
-		hungerManager.update(this.mockPlayer);
+		hungerManager.tick(this.mockPlayer);
 
 		this.pool.setHealth(this.mockPlayer.getHealth());
 		this.pool.setFoodLevel(this.hungerManager.getFoodLevel());

@@ -6,29 +6,29 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mossshade.soullink.Constants;
 import com.mossshade.soullink.pool.PoolAPI;
-import net.minecraft.command.DefaultPermissions;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.server.permissions.Permissions;
 
-public class Reset implements Command<ServerCommandSource> {
+public class Reset implements Command<CommandSourceStack> {
 
-	public static void register(LiteralArgumentBuilder<ServerCommandSource> root) {
-		root.then(CommandManager.literal(Constants.COMMAND_RESET)
-				.requires(source -> source.getPermissions().hasPermission(DefaultPermissions.MODERATORS))
+	public static void register(LiteralArgumentBuilder<CommandSourceStack> root) {
+		root.then(Commands.literal(Constants.COMMAND_RESET)
+				.requires(source -> source.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
 				.executes(new Reset())
 		);
 	}
 
 	@Override
-	public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-		ServerCommandSource serverCommandSource = context.getSource();
+	public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+		CommandSourceStack serverCommandSource = context.getSource();
 		MinecraftServer minecraftServer = serverCommandSource.getServer();
 
 		PoolAPI.get(minecraftServer).reset();
 
-		serverCommandSource.sendFeedback(() -> Text.translatable(Constants.COMMAND_RESET_MESSAGE), false);
+		serverCommandSource.sendSuccess(() -> Component.translatable(Constants.COMMAND_RESET_MESSAGE), false);
 
 		return Command.SINGLE_SUCCESS;
 	}

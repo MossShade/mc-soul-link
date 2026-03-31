@@ -9,21 +9,21 @@ import com.mossshade.soullink.commands.config.Enable;
 import com.mossshade.soullink.commands.config.Reload;
 import com.mossshade.soullink.config.ConfigManager;
 import com.mossshade.soullink.config.ModConfig;
-import net.minecraft.command.DefaultPermissions;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.permissions.Permissions;
 
-public class Config implements Command<ServerCommandSource> {
+public class Config implements Command<CommandSourceStack> {
 
-	public static void register(LiteralArgumentBuilder<ServerCommandSource> root) {
-		LiteralArgumentBuilder<ServerCommandSource> config = CommandManager.literal(Constants.COMMAND_CONFIG);
+	public static void register(LiteralArgumentBuilder<CommandSourceStack> root) {
+		LiteralArgumentBuilder<CommandSourceStack> config = Commands.literal(Constants.COMMAND_CONFIG);
 
-		config.requires(source -> source.getPermissions().hasPermission(DefaultPermissions.MODERATORS));
+		config.requires(source -> source.permissions().hasPermission(Permissions.COMMANDS_MODERATOR));
 
 		Enable.register(config);
 		Reload.register(config);
@@ -32,40 +32,40 @@ public class Config implements Command<ServerCommandSource> {
 	}
 
 	@Override
-	public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-		ServerCommandSource serverCommandSource = context.getSource();
+	public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+		CommandSourceStack serverCommandSource = context.getSource();
 
-		serverCommandSource.sendFeedback(() -> getFeedback(ConfigManager.CONFIG, true), false);
+		serverCommandSource.sendSuccess(() -> getFeedback(ConfigManager.CONFIG, true), false);
 
 		return Command.SINGLE_SUCCESS;
 	}
 
-	public static MutableText getEnableStatusMessage(boolean enabled) {
-		return Text.translatable(enabled ? Constants.CONFIG_STATUS_ENABLED_MESSAGE : Constants.CONFIG_STATUS_DISABLED_MESSAGE);
+	public static MutableComponent getEnableStatusMessage(boolean enabled) {
+		return Component.translatable(enabled ? Constants.CONFIG_STATUS_ENABLED_MESSAGE : Constants.CONFIG_STATUS_DISABLED_MESSAGE);
 	}
 
 	private static ClickEvent getCommandSuggestion(String command, Boolean state) {
 		return new ClickEvent.SuggestCommand("/" + Constants.COMMAND_NAME + " " + Constants.COMMAND_CONFIG + " " + command + " " + state);
 	}
 
-	public static MutableText getFeedback(ModConfig config, boolean interactable) {
+	public static MutableComponent getFeedback(ModConfig config, boolean interactable) {
 		String padding = "    ";
-		MutableText newLine = Text.literal("\n");
-		Text hoverMessage = Text.translatable(Constants.COMMAND_HELP_HOVER_MESSAGE);
+		MutableComponent newLine = Component.literal("\n");
+		Component hoverMessage = Component.translatable(Constants.COMMAND_HELP_HOVER_MESSAGE);
 
-		MutableText title = Text.translatable(Constants.COMMAND_HELP_CONFIG_TITLE).formatted(Formatting.BOLD);
+		MutableComponent title = Component.translatable(Constants.COMMAND_HELP_CONFIG_TITLE).withStyle(ChatFormatting.BOLD);
 
-		MutableText enabled = Text.literal(padding)
-				.append(Text.translatable(Constants.COMMAND_HELP_CONFIG_ENABLE)
-						.styled(style -> style
-								.withColor(config.enabled ? Formatting.GREEN : Formatting.RED)
+		MutableComponent enabled = Component.literal(padding)
+				.append(Component.translatable(Constants.COMMAND_HELP_CONFIG_ENABLE)
+						.withStyle(style -> style
+								.withColor(config.enabled ? ChatFormatting.GREEN : ChatFormatting.RED)
 								.withClickEvent(interactable ? getCommandSuggestion(Constants.COMMAND_CONFIG_ENABLE, !config.enabled) : null)
 								.withHoverEvent(interactable ? new HoverEvent.ShowText(hoverMessage) : null)
 						)
 				);
 
 
-		return Text.empty()
+		return Component.empty()
 				.append(title).append(newLine)
 				.append(enabled);
 	}

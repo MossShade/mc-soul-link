@@ -3,17 +3,17 @@ package com.mossshade.soullink.pool;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.mossshade.soullink.Constants;
-import net.minecraft.datafixer.DataFixTypes;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.core.Holder;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.PersistentState;
-import net.minecraft.world.PersistentStateType;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 
-public class SharedPoolState extends PersistentState {
+public class SharedPoolState extends SavedData {
 
 	private final float maxHealth;
 	private final int maxFoodLevel;
@@ -42,7 +42,7 @@ public class SharedPoolState extends PersistentState {
 			})
 	);
 
-	public static final PersistentStateType<SharedPoolState> TYPE = new PersistentStateType<>(
+	public static final SavedDataType<SharedPoolState> TYPE = new SavedDataType<>(
 			Constants.SHARED_POOL,
 			SharedPoolState::new,
 			CODEC,
@@ -50,7 +50,7 @@ public class SharedPoolState extends PersistentState {
 
 
 	public SharedPoolState() {
-		RegistryEntry<EntityAttribute> maxHealthRegistry = EntityAttributes.MAX_HEALTH;
+		Holder<Attribute> maxHealthRegistry = Attributes.MAX_HEALTH;
 		if (maxHealthRegistry != null && maxHealthRegistry.value() != null && maxHealthRegistry.value() != null) {
 			this.maxHealth = (float) maxHealthRegistry.value().getDefaultValue();
 		} else {
@@ -71,9 +71,9 @@ public class SharedPoolState extends PersistentState {
 	}
 
 	public static SharedPoolState getServerState(MinecraftServer server) {
-		ServerWorld serverWorld = server.getWorld(ServerWorld.OVERWORLD);
+		ServerLevel serverWorld = server.getLevel(ServerLevel.OVERWORLD);
 		assert serverWorld != null;
-		return serverWorld.getPersistentStateManager().getOrCreate(TYPE);
+		return serverWorld.getDataStorage().computeIfAbsent(TYPE);
 	}
 
 	public float getHealth() {
@@ -81,7 +81,7 @@ public class SharedPoolState extends PersistentState {
 	}
 
 	public void setHealth(float health) {
-		this.health = MathHelper.clamp(health, 0.0F, this.maxHealth);
+		this.health = Mth.clamp(health, 0.0F, this.maxHealth);
 	}
 
 	public int getFoodLevel() {
@@ -89,7 +89,7 @@ public class SharedPoolState extends PersistentState {
 	}
 
 	public void setFoodLevel(int foodLevel) {
-		this.foodLevel = MathHelper.clamp(foodLevel, 0, this.maxFoodLevel);
+		this.foodLevel = Mth.clamp(foodLevel, 0, this.maxFoodLevel);
 	}
 
 	public float getSaturationLevel() {
@@ -97,7 +97,7 @@ public class SharedPoolState extends PersistentState {
 	}
 
 	public void setSaturationLevel(float saturationLevel) {
-		this.saturationLevel = MathHelper.clamp(saturationLevel, 0.0F, (float)this.foodLevel);
+		this.saturationLevel = Mth.clamp(saturationLevel, 0.0F, (float)this.foodLevel);
 	}
 
 	public float getExhaustion() {
@@ -105,7 +105,7 @@ public class SharedPoolState extends PersistentState {
 	}
 
 	public void setExhaustion(float exhaustion) {
-		this.exhaustion = MathHelper.clamp(exhaustion, 0, 40.0F);
+		this.exhaustion = Mth.clamp(exhaustion, 0, 40.0F);
 	}
 
 	public int getFoodTickTimer() {

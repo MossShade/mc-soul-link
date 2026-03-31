@@ -6,23 +6,23 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mossshade.soullink.Constants;
 import com.mossshade.soullink.config.ConfigManager;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 
-public class Reload implements Command<ServerCommandSource> {
+public class Reload implements Command<CommandSourceStack> {
 
-	public static void register(LiteralArgumentBuilder<ServerCommandSource> root) {
-		root.then(CommandManager.literal(Constants.COMMAND_CONFIG_RELOAD).executes(new Reload()));
+	public static void register(LiteralArgumentBuilder<CommandSourceStack> root) {
+		root.then(Commands.literal(Constants.COMMAND_CONFIG_RELOAD).executes(new Reload()));
 	}
 
 	@Override
-	public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-		ServerCommandSource serverCommandSource = context.getSource();
+	public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+		CommandSourceStack serverCommandSource = context.getSource();
 
 		ConfigManager.load();
 
-		serverCommandSource.sendFeedback(() -> Text.translatable(Constants.CONFIG_RELOAD_MESSAGE), false);
+		serverCommandSource.sendSuccess(() -> Component.translatable(Constants.CONFIG_RELOAD_MESSAGE), false);
 
 		return Command.SINGLE_SUCCESS;
 	}

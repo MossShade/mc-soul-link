@@ -1,12 +1,12 @@
 package com.mossshade.soullink.interfaces;
 
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 public interface HungerManagerAccess {
 
-	ServerPlayerEntity soullink$getPlayer();
+	ServerPlayer soullink$getPlayer();
 
-	void soullink$setPlayer(ServerPlayerEntity player);
+	void soullink$setPlayer(ServerPlayer player);
 
 	float soullink$getExhaustion();
 

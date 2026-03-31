@@ -1,8 +1,8 @@
 package com.mossshade.soullink.damage;
 
 import com.mossshade.soullink.Constants;
-import net.minecraft.entity.damage.*;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.core.Holder;
+import net.minecraft.world.damagesource.*;
 
 public class SoullinkDamageTypes {
 
@@ -14,6 +14,6 @@ public class SoullinkDamageTypes {
 			DeathMessageType.DEFAULT
 	);
 
-	public static final DamageSource SOUL_FRAGMENTATION = new DamageSource(RegistryEntry.of(damageType));
+	public static final DamageSource SOUL_FRAGMENTATION = new DamageSource(Holder.direct(damageType));
 
 }
