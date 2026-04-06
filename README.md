@@ -17,6 +17,7 @@ All commands are prefixed with `/soullink`.
 - `/soullink status`: Checks if the mod is enabled and displays current pool status. (Health, hunger, saturation, etc)
 - `/soullink reset`: Resets the pool status to default values (20 HP, 20 hunger, 5 saturation, etc). Requires OP permission.
 - `/soullink config enable true|false`: Enables or disables the mod.
+- `/soullink config reload`: Reloads the config file.
 
 ## Installation
 - Install [Fabric enabled server](https://fabricmc.net/use/server/)
@@ -52,6 +53,5 @@ Google Drive can be used to host the resource pack:
 
 
 ## Known Issues
-- Inconsistent: Client desync when one player receives lethal damage, but a totem saves them. This has mostly been fixed, but issue may rarely occur.  
-  Workaround: Affected clients must disconnect and reconnect to the server.
+- None
 
