@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ServerPlayerEntityMixin {
 
 	@Inject(method = "tickRegeneration", at = @At("HEAD"), cancellable = true)
-	public void tickHunger(CallbackInfo ci) {
+	public void tickRegeneration(CallbackInfo ci) {
 		ServerPlayer self = (ServerPlayer)(Object) this;
 		if (self.getGameProfile() == null || self instanceof PoolMockPlayer) return;
 		if (ConfigManager.isDisabled()) return;

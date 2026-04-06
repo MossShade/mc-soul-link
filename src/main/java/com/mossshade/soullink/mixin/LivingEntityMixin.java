@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class LivingEntityMixin {
 
 	@Inject(method = "heal", at = @At("HEAD"), cancellable = true)
-	public void heal(float amount, CallbackInfo ci) {
+	public void heal(float heal, CallbackInfo ci) {
 		LivingEntity livingEntity = (LivingEntity)(Object) this;
 		if (!(livingEntity instanceof ServerPlayer player)) return;
 		if (player.getGameProfile() == null || player instanceof PoolMockPlayer) return;
@@ -26,16 +26,16 @@ public class LivingEntityMixin {
 
 		SharedPoolManager poolManager = PoolAPI.get(player);
 
-		Soullink.LOGGER.debug("heal {} for player {}", amount, player);
+		Soullink.LOGGER.debug("heal {} for player {}", heal, player);
 
 		poolManager.dirtyTracker.markDirty(player.getUUID());
-		poolManager.addHeal(amount);
+		poolManager.addHeal(heal);
 
 		ci.cancel();
 	}
 
 	@Inject(method = "checkTotemDeathProtection", at = @At("TAIL"))
-	public void tryUseDeathProtector(DamageSource source, CallbackInfoReturnable<Boolean> cir) {
+	public void checkTotemDeathProtection(DamageSource killingDamage, CallbackInfoReturnable<Boolean> cir) {
 		LivingEntity livingEntity = (LivingEntity)(Object) this;
 		if (!(livingEntity instanceof ServerPlayer player)) return;
 		if (player.getGameProfile() == null || player instanceof PoolMockPlayer) return;
@@ -51,7 +51,7 @@ public class LivingEntityMixin {
 		if (usedDeathProtector) {
 			poolManager.propagateHealth(1.0F);
 		} else {
-			poolManager.killEveryone(source);
+			poolManager.killEveryone(killingDamage);
 		}
 	}
 

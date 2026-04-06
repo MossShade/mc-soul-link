@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class PlayerEntityMixin {
 
 	@Inject(method = "<init>", at = @At("TAIL"))
-	private void init(Level world, GameProfile profile, CallbackInfo ci) {
+	private void init(Level level, GameProfile gameProfile, CallbackInfo ci) {
 		Player player = (Player)(Object) this;
 		if (!(player instanceof ServerPlayer serverPlayerEntity) || player instanceof PoolMockPlayer) return;
 
@@ -32,7 +32,7 @@ public class PlayerEntityMixin {
 	}
 
 	@Inject(method = "actuallyHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;setHealth(F)V", shift = At.Shift.AFTER))
-	public void applyDamage(ServerLevel world, DamageSource source, float amount, CallbackInfo ci) {
+	public void actuallyHurt(ServerLevel level, DamageSource source, float dmg, CallbackInfo ci) {
 		Player self = (Player)(Object) this;
 		if (!(self instanceof ServerPlayer player)) return;
 		if (player == null || player.getGameProfile() == null || player instanceof PoolMockPlayer) return;
@@ -40,14 +40,14 @@ public class PlayerEntityMixin {
 
 		SharedPoolManager poolManager = PoolAPI.get(player);
 
-		Soullink.LOGGER.debug("applyDamage {} for player {}", amount, player);
+		Soullink.LOGGER.debug("applyDamage {} for player {}", dmg, player);
 
 		poolManager.dirtyTracker.markDirty(player.getUUID());
-		poolManager.addDamage(amount);
+		poolManager.addDamage(dmg);
 	}
 
 	@Inject(method = "causeFoodExhaustion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/food/FoodData;addExhaustion(F)V", shift = At.Shift.AFTER))
-	public void addExhaustion(float exhaustion, CallbackInfo ci) {
+	public void causeFoodExhaustion(float amount, CallbackInfo ci) {
 		Player self = (Player)(Object) this;
 		if (!(self instanceof ServerPlayer player)) return;
 		if (player == null || player.getGameProfile() == null || player instanceof PoolMockPlayer) return;
@@ -55,10 +55,10 @@ public class PlayerEntityMixin {
 
 		SharedPoolManager poolManager = PoolAPI.get(player);
 
-		Soullink.LOGGER.debug("addExhaustion {} for player {}", exhaustion, player);
+		Soullink.LOGGER.debug("addExhaustion {} for player {}", amount, player);
 
 		poolManager.dirtyTracker.markDirty(player.getUUID());
-		poolManager.addExhaustion(exhaustion);
+		poolManager.addExhaustion(amount);
 	}
 
 }

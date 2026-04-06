@@ -26,25 +26,27 @@ public class HungerManagerMixin implements HungerManagerAccess {
 	private ServerPlayer soullink$player;
 
 	@Inject(method = "tick", at = @At("HEAD"), cancellable = true)
-	private void update(ServerPlayer player, CallbackInfo ci) {
-		if (player == null || player.getGameProfile() == null || player instanceof PoolMockPlayer) return;
+	private void tick(ServerPlayer player, CallbackInfo ci) {
+		if (player == null || player instanceof PoolMockPlayer) return;
 		if (ConfigManager.isDisabled()) return;
+
+		PoolAPI.get(player).tickSharedHunger();
 
 		ci.cancel();
 	}
 
 	@Inject(method = "add", at = @At("HEAD"), cancellable = true)
-	private void eat(int nutrition, float saturation, CallbackInfo ci) {
+	private void add(int food, float saturation, CallbackInfo ci) {
 		ServerPlayer player = this.soullink$getPlayer();
-		if (player == null || player.getGameProfile() == null || player instanceof PoolMockPlayer) return;
+		if (player == null || player instanceof PoolMockPlayer) return;
 		if (ConfigManager.isDisabled()) return;
 
 		SharedPoolManager poolManager = PoolAPI.get(player);
 
-		Soullink.LOGGER.debug("eat {} nutrition and {} saturation for player {}", nutrition, saturation, player);
+		Soullink.LOGGER.debug("eat {} nutrition and {} saturation for player {}", food, saturation, player);
 
 		poolManager.dirtyTracker.markDirty(player.getUUID());
-		poolManager.addFood(nutrition, saturation);
+		poolManager.addFood(food, saturation);
 
 		ci.cancel();
 	}
@@ -65,8 +67,8 @@ public class HungerManagerMixin implements HungerManagerAccess {
 	}
 
 	@Override
-	public void soullink$setExhaustion(float exhaustion) {
-		this.exhaustionLevel = exhaustion;
+	public void soullink$setExhaustion(float exhaustionLevel) {
+		this.exhaustionLevel = exhaustionLevel;
 	}
 
 	@Override
@@ -75,7 +77,7 @@ public class HungerManagerMixin implements HungerManagerAccess {
 	}
 
 	@Override
-	public void soullink$setFoodTickTimer(int foodTickTimer) {
-		this.tickTimer = foodTickTimer;
+	public void soullink$setFoodTickTimer(int tickTimer) {
+		this.tickTimer = tickTimer;
 	}
 }

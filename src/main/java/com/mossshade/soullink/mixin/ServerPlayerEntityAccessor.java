@@ -8,9 +8,15 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface ServerPlayerEntityAccessor {
 
 	@Accessor("lastSentHealth")
-	void setSyncedHealth(float value);
+	void setLastSentHealth(float value);
 
 	@Accessor("lastSentHealth")
-	float getSyncedHealth();
+	float getLastSentHealth();
+
+	@Accessor("lastSentFood")
+	void setLastSentFood(int value);
+
+	@Accessor("lastFoodSaturationZero")
+	void setLastFoodSaturationZero(boolean value);
 
 }

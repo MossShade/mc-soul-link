@@ -7,6 +7,7 @@ import com.mossshade.soullink.interfaces.HungerManagerAccess;
 import com.mossshade.soullink.mixin.ServerPlayerEntityAccessor;
 import com.mossshade.soullink.overrides.PoolMockPlayer;
 import com.mossshade.soullink.overrides.SharedHungerManager;
+import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,6 +25,10 @@ public class SharedPoolManager implements IPoolManager<ServerPlayer> {
 	private final PoolMockPlayer mockPlayer;
 
 	private final SharedHungerManager hungerManager;
+
+	private boolean isDead = false;
+
+	private boolean tickedHunger = false;
 
 	public SharedPoolManager(MinecraftServer minecraftServer) {
 		this.minecraftServer = minecraftServer;
@@ -58,6 +63,7 @@ public class SharedPoolManager implements IPoolManager<ServerPlayer> {
 	public void propagatePool() {
 		this.pool.setDirty();
 		this.dirtyTracker.markDirty(dirtyTracker.getDirt());
+		this.tickedHunger = false;
 
 		syncEveryone();
 	}
@@ -67,6 +73,8 @@ public class SharedPoolManager implements IPoolManager<ServerPlayer> {
 		this.dirtyTracker.clean();
 
 		this.pool.initValues();
+
+		isDead = false;
 
 		this.propagatePool();
 	}
@@ -79,27 +87,35 @@ public class SharedPoolManager implements IPoolManager<ServerPlayer> {
 
 	@Override
 	public void syncEntity(ServerPlayer player) {
-		player.setHealth(this.pool.getHealth());
-
-		ServerPlayerEntityAccessor serverPlayerEntityAccessor = (ServerPlayerEntityAccessor) player;
-		if (serverPlayerEntityAccessor.getSyncedHealth() > player.getHealth()) {
-			if (this.dirtyTracker.getDirt() == null || this.dirtyTracker.getDirt() != player.getUUID()) {
-				((ServerPlayerEntityAccessor) player).setSyncedHealth(this.pool.getHealth());
-			}
+		if (isDead) {
+			player.setHealth(0);
+			return;
 		}
 
+		float previousHealth = player.getHealth();
+
+		player.setHealth(this.pool.getHealth());
 		player.getFoodData().setFoodLevel(this.pool.getFoodLevel());
 		player.getFoodData().setSaturation(this.pool.getSaturationLevel());
 		HungerManagerAccess hungerManagerAccess = (HungerManagerAccess) player.getFoodData();
 		hungerManagerAccess.soullink$setExhaustion(this.pool.getExhaustion());
 		hungerManagerAccess.soullink$setFoodTickTimer(this.pool.getFoodTickTimer());
+
+		if (previousHealth < player.getHealth()) {
+			player.connection.send(new ClientboundSetHealthPacket(player.getHealth(), player.getFoodData().getFoodLevel(), player.getFoodData().getSaturationLevel()));
+
+			ServerPlayerEntityAccessor serverPlayerEntityAccessor = (ServerPlayerEntityAccessor) player;
+			serverPlayerEntityAccessor.setLastSentHealth(player.getHealth());
+			serverPlayerEntityAccessor.setLastSentFood(player.getFoodData().getFoodLevel());
+			serverPlayerEntityAccessor.setLastFoodSaturationZero(player.getFoodData().getSaturationLevel() == 0.0F);
+		}
 	}
 
 	@Override
 	public void applyToEveryone(EveryoneOperation<ServerPlayer> function, boolean skipSourcePlayer) {
 		for (ServerLevel world : this.minecraftServer.getAllLevels()) {
 			for (ServerPlayer serverPlayerEntity : world.players()) {
-				if (!skipSourcePlayer && this.dirtyTracker.isDirty() && this.dirtyTracker.getDirt() == serverPlayerEntity.getUUID()) continue;
+				if (skipSourcePlayer && this.dirtyTracker.isDirty() && this.dirtyTracker.getDirt() == serverPlayerEntity.getUUID()) continue;
 
 				function.apply(serverPlayerEntity);
 			}
@@ -109,7 +125,10 @@ public class SharedPoolManager implements IPoolManager<ServerPlayer> {
 	public void killEveryone(DamageSource source) {
 		Soullink.LOGGER.debug("killEveryone due to {}", source);
 
+		isDead = true;
+
 		this.applyToEveryone((player) -> {
+			player.setHealth(0F);
 			player.getCombatTracker().recordDamage(SoullinkDamageTypes.SOUL_FRAGMENTATION, 0f);
 			player.die(SoullinkDamageTypes.SOUL_FRAGMENTATION);
 		} , true);
@@ -137,8 +156,16 @@ public class SharedPoolManager implements IPoolManager<ServerPlayer> {
 	}
 
 	public void tickSharedHunger() {
+		if (tickedHunger) return;
+		if (isDead) return;
 		if (ConfigManager.isDisabled()) return;
 
+		tickedHunger = true;
+
+		this.hungerTick();
+	}
+
+	private void hungerTick() {
 		this.dirtyTracker.clean();
 		this.hungerManager.setValues(this);
 		this.mockPlayer.setHealth(this.pool.getHealth());
