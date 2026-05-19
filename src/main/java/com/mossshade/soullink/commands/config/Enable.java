@@ -8,9 +8,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mossshade.soullink.Constants;
 import com.mossshade.soullink.commands.Config;
 import com.mossshade.soullink.config.ConfigManager;
+import com.mossshade.soullink.utils.LocalizedText;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.Component;
 
 public class Enable implements Command<CommandSourceStack> {
 
@@ -31,7 +31,7 @@ public class Enable implements Command<CommandSourceStack> {
 		ConfigManager.CONFIG.enabled = enabled;
 		ConfigManager.save();
 
-		serverCommandSource.sendSuccess(() -> Component.translatable(Constants.CONFIG_ENABLE_MESSAGE, Config.getEnableStatusMessage(enabled)), false);
+		serverCommandSource.sendSuccess(() -> LocalizedText.getTranslatableWithFallback(Constants.CONFIG_ENABLE_MESSAGE, Config.getEnableStatusMessage(enabled)), false);
 		serverCommandSource.sendSuccess(() -> Config.getFeedback(ConfigManager.CONFIG, true), false);
 
 		return Command.SINGLE_SUCCESS;

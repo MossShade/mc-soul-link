@@ -6,9 +6,9 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mossshade.soullink.Constants;
 import com.mossshade.soullink.config.ConfigManager;
+import com.mossshade.soullink.utils.LocalizedText;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.Component;
 
 public class Reload implements Command<CommandSourceStack> {
 
@@ -22,7 +22,7 @@ public class Reload implements Command<CommandSourceStack> {
 
 		ConfigManager.load();
 
-		serverCommandSource.sendSuccess(() -> Component.translatable(Constants.CONFIG_RELOAD_MESSAGE), false);
+		serverCommandSource.sendSuccess(() -> LocalizedText.getTranslatableWithFallback(Constants.CONFIG_RELOAD_MESSAGE), false);
 
 		return Command.SINGLE_SUCCESS;
 	}

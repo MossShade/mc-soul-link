@@ -8,10 +8,10 @@ import com.mossshade.soullink.Constants;
 import com.mossshade.soullink.config.ConfigManager;
 import com.mossshade.soullink.pool.PoolAPI;
 import com.mossshade.soullink.pool.SharedPoolManager;
+import com.mossshade.soullink.utils.LocalizedText;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 
 public class Status implements Command<CommandSourceStack> {
@@ -28,7 +28,7 @@ public class Status implements Command<CommandSourceStack> {
 		SharedPoolManager poolManager = PoolAPI.get(minecraftServer);
 
 		serverCommandSource.sendSuccess(() -> Config.getFeedback(ConfigManager.CONFIG, false), false);
-		serverCommandSource.sendSuccess(() -> Component.translatable(
+		serverCommandSource.sendSuccess(() -> LocalizedText.getTranslatableWithFallback(
 				Constants.COMMAND_STATUS_MESSAGE,
 				poolManager.getPoolHealth(),
 				poolManager.getPoolFoodLevel(),

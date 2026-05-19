@@ -6,9 +6,9 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mossshade.soullink.Constants;
 import com.mossshade.soullink.pool.PoolAPI;
+import com.mossshade.soullink.utils.LocalizedText;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.permissions.Permissions;
 
@@ -28,7 +28,7 @@ public class Reset implements Command<CommandSourceStack> {
 
 		PoolAPI.get(minecraftServer).reset();
 
-		serverCommandSource.sendSuccess(() -> Component.translatable(Constants.COMMAND_RESET_MESSAGE), false);
+		serverCommandSource.sendSuccess(() -> LocalizedText.getTranslatableWithFallback(Constants.COMMAND_RESET_MESSAGE), false);
 
 		return Command.SINGLE_SUCCESS;
 	}

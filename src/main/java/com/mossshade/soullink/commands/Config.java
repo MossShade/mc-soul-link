@@ -9,6 +9,7 @@ import com.mossshade.soullink.commands.config.Enable;
 import com.mossshade.soullink.commands.config.Reload;
 import com.mossshade.soullink.config.ConfigManager;
 import com.mossshade.soullink.config.ModConfig;
+import com.mossshade.soullink.utils.LocalizedText;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -41,7 +42,7 @@ public class Config implements Command<CommandSourceStack> {
 	}
 
 	public static MutableComponent getEnableStatusMessage(boolean enabled) {
-		return Component.translatable(enabled ? Constants.CONFIG_STATUS_ENABLED_MESSAGE : Constants.CONFIG_STATUS_DISABLED_MESSAGE);
+		return LocalizedText.getTranslatableWithFallback(enabled ? Constants.CONFIG_STATUS_ENABLED_MESSAGE : Constants.CONFIG_STATUS_DISABLED_MESSAGE);
 	}
 
 	private static ClickEvent getCommandSuggestion(String command, Boolean state) {
@@ -51,12 +52,12 @@ public class Config implements Command<CommandSourceStack> {
 	public static MutableComponent getFeedback(ModConfig config, boolean interactable) {
 		String padding = "    ";
 		MutableComponent newLine = Component.literal("\n");
-		Component hoverMessage = Component.translatable(Constants.COMMAND_HELP_HOVER_MESSAGE);
+		Component hoverMessage = LocalizedText.getTranslatableWithFallback(Constants.COMMAND_HELP_HOVER_MESSAGE);
 
-		MutableComponent title = Component.translatable(Constants.COMMAND_HELP_CONFIG_TITLE).withStyle(ChatFormatting.BOLD);
+		MutableComponent title = LocalizedText.getTranslatableWithFallback(Constants.COMMAND_HELP_CONFIG_TITLE).withStyle(ChatFormatting.BOLD);
 
 		MutableComponent enabled = Component.literal(padding)
-				.append(Component.translatable(Constants.COMMAND_HELP_CONFIG_ENABLE)
+				.append(LocalizedText.getTranslatableWithFallback(Constants.COMMAND_HELP_CONFIG_ENABLE)
 						.withStyle(style -> style
 								.withColor(config.enabled ? ChatFormatting.GREEN : ChatFormatting.RED)
 								.withClickEvent(interactable ? getCommandSuggestion(Constants.COMMAND_CONFIG_ENABLE, !config.enabled) : null)
