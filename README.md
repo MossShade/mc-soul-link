@@ -28,7 +28,7 @@ All commands are prefixed with `/soullink`.
 Note: Since this is a server-only mod, all clients, including vanilla clients, are able to join the server.
 
 
-### Resource Pack
+### Resource Pack (Optional)
 The mod uses a language resource pack to provide translations. (Currently only English)
 
 #### Download on Clients

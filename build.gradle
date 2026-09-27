@@ -71,13 +71,23 @@ def resourcePackSupportedFormats = project.pack_supported_formats
 		.split(',')
 		.collect { it.trim() }
 		.findAll { !it.isEmpty() }
-		.collect { Integer.parseInt(it) }
+		.collect { (it.toString().contains("."))? Double.parseDouble(it) : Integer.parseInt(it) }
+def pack_format = (project.pack_format.toString().contains("."))?
+		Double.parseDouble(project.pack_format.toString())
+		: Integer.parseInt(project.pack_format.toString())
+def min_format = (project.pack_min_format.toString().contains("."))?
+		Double.parseDouble(project.pack_min_format.toString())
+		: Integer.parseInt(project.pack_min_format.toString())
+def max_format = (project.pack_max_format.toString().contains("."))?
+		Double.parseDouble(project.pack_max_format.toString())
+		: Integer.parseInt(project.pack_max_format.toString())
+
 def packMcmeta = [
 		pack: [
 				description      : "Resource pack for ${resourcePackName} mod",
-				pack_format      : Integer.parseInt(project.pack_format.toString()),
-				min_format       : Integer.parseInt(project.pack_min_format.toString()),
-				max_format       : Integer.parseInt(project.pack_max_format.toString()),
+				pack_format      : pack_format,
+				min_format       : min_format,
+				max_format       : max_format,
 				supported_formats: resourcePackSupportedFormats
 		]
 ]
